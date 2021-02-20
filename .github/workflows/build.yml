@@ -74,6 +74,14 @@ jobs:
         working-directory: ./Python/Tests
         shell: bash
 
+      - run: Get-Process
+        shell: pwsh
+
+      - run: sleep 10
+
+      - run: Get-Process
+        shell: pwsh
+
       - name: Save release
         run: |
           mv ./build/Source/qi ./qi
