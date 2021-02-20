@@ -14,29 +14,21 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - {
-          name: "Ubuntu GCC", artifact: "qi-linux.tar.gz",
-          os: ubuntu-16.04,
-          cc: "gcc-9", cxx: "g++-9"
-        }
+        # - {
+        #   name: "Ubuntu GCC", artifact: "qi-linux.tar.gz",
+        #   os: ubuntu-16.04,
+        #   cc: "gcc-9", cxx: "g++-9"
+        # }
         - {
           name: "macOS", artifact: "qi-macos.tar.gz",
-          os: macos-10.15,
+          os: macos-latest,
           cc: "clang", cxx: "clang++"
         }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
         with:
           submodules: 'true'
-          fetch-depth: 0
-
-      - name: Install GNU tar
-        shell: bash
-        run: |
-          if [ "${{runner.os}}" == "macOS" ]; then
-            brew install gnu-tar
-          fi
 
       - name: VCPKG Location
         uses: lukka/set-shell-env@v1
@@ -52,13 +44,7 @@ jobs:
           vcpkgArguments: '@${{ env.VCPKGRESPONSEFILE }}'
           vcpkgDirectory: ${{github.workspace}}/vcpkg
           appendedCacheKey: ${{ hashFiles( env.VCPKGRESPONSEFILE ) }}
-
-      - name: Check name
-        run: |
-          git status
-          git describe --tags --dirty
-        shell: bash
-
+  
       - name: CMake
         uses: lukka/run-cmake@v2
         id: runcmake
@@ -91,13 +77,9 @@ jobs:
       - name: Save release
         run: |
           mv ./build/Source/qi ./qi
-          if [ "${{runner.os}}" == "macOS" ]; then
-            echo "Using GNU tar"
-            gtar -czf ${{matrix.config.artifact}} qi
-          else
-            echo "Using system tar"
-            tar -czf ${{matrix.config.artifact}} qi
-          fi
+          which tar
+          tar -czvf ${{matrix.config.artifact}} qi
+          ls -lh
         shell: bash
 
       - name: Upload
@@ -140,13 +122,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - {
-          name: "Ubuntu GCC", artifact: "qi-linux.tar.gz",
-          os: ubuntu-16.04
-        }
+        # - {
+        #   name: "Ubuntu GCC", artifact: "qi-linux.tar.gz",
+        #   os: ubuntu-16.04
+        # }
         - {
           name: "macOS", artifact: "qi-macos.tar.gz",
-          os: macos-10.15
+          os: macos-latest
         }
     needs: release
 
@@ -169,7 +151,6 @@ jobs:
         URL=`cat ./upload_url`
         echo ${URL}
         echo "::set-output name=upload_url::${URL}"
-
     - name: Upload to Release
       id: upload_to_release
       uses: actions/upload-release-asset@v1.0.1
