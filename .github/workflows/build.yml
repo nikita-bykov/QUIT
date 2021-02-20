@@ -79,9 +79,6 @@ jobs:
 
       - run: sleep 10
 
-      - run: Get-Process
-        shell: pwsh
-
       - name: Save release
         run: |
           mv ./build/Source/qi ./qi
