@@ -74,19 +74,11 @@ jobs:
         working-directory: ./Python/Tests
         shell: bash
 
-      - run: Get-Process
-        shell: pwsh
-
-      - run: sleep 10
-
-      - run: Get-Process
-        shell: pwsh
-
       - name: Save release
         run: |
           mv ./build/Source/qi ./qi
           which tar
-          tar -czvf ${{matrix.config.artifact}} qi
+          tar -cvf ${{matrix.config.artifact}} qi
           ls -lh
         shell: bash
 
